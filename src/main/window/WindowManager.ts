@@ -2,6 +2,7 @@ import installExtension, { REACT_DEVELOPER_TOOLS } from "electron-devtools-insta
 import * as E from "electron";
 import * as url from "url";
 
+import Fonts from "../Fonts";
 import Tabs from "./Tabs";
 import shortcuts from "../shortcuts";
 import * as Const from "Const";
@@ -62,9 +63,9 @@ class WindowManager implements IWindowManager {
 
     openUrl = (url: string) => {
         if (/figma:\/\//.test(url)) {
-            this.addTab('loadContetnt.js', url.replace(/figma:\//, Const.HOMEPAGE));
+            this.addTab('loadContetnt.js', url.replace(/figma:\//, Const.HOMEPAGE), false);
         } else if (/https?:\/\//.test(url)) {
-            this.addTab('loadContetnt.js', url);
+            this.addTab('loadContetnt.js', url, false);
         }
     }
 
@@ -110,16 +111,28 @@ class WindowManager implements IWindowManager {
 
             currentView && go && currentView!.webContents.loadURL(`${this.home}`);
         });
+
+        E.ipcMain.on(Const.UPDATEFONTS, (event: Event) => {
+            
+            const fonts = Fonts.updateFonts();
+            
+            const views = E.BrowserView.getAllViews();
+            views.forEach(view => {
+                view.webContents.send(Const.UPDATEFONTS, fonts);
+            });
+
+            this.mainWindow.webContents.send(Const.UPDATEFONTS, fonts);
+        });
     }
 
-    private addTab = (scriptPreload: string, url: string = `${this.home}/login`) => {
+    private addTab = (scriptPreload: string, url: string = `${this.home}/login`, showBackBtn: boolean = true) => {
         const tab = Tabs.newTab(url, this.getBounds(), scriptPreload);
 
         this.mainWindow.setBrowserView(tab);
         tab.webContents.on('will-navigate', this.onMainWindowWillNavigate);
         tab.webContents.on('new-window', this.onNewWindow);
 
-        this.mainWindow.webContents.send(Const.TABADDED, { id: tab.id, url: `${this.home}/login`, showBackBtn: true});
+        this.mainWindow.webContents.send(Const.TABADDED, { id: tab.id, url: `${this.home}/login`, showBackBtn});
     }
 
     private onNewWindow = (event: Event, url: string) => {

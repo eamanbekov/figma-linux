@@ -10,6 +10,8 @@ const UPDATEFILEKEY = 'updateFileKey';
 
 const TOHOME = 'toHome';
 
+const UPDATEFONTS = 'updateFonts';
+
 export {
 	NEWTAB,
 	TABADDED,
@@ -21,5 +23,7 @@ export {
 	SETTITLE,
 	UPDATEFILEKEY,
 
-	TOHOME
+	TOHOME,
+
+	UPDATEFONTS
 }

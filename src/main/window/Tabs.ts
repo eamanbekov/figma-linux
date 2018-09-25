@@ -30,11 +30,7 @@ class Tabs implements ITabs {
         tab.setBounds(options);
         tab.webContents.loadURL(url);
         tab.webContents.on('dom-ready', () => {
-            let fonts = Fonts.getFonts([
-                '/usr/share/fonts',
-                `${process.env.HOME}/.local/share/fonts`
-            ]);
-            tab.webContents.send('updateFonts', fonts);
+            tab.webContents.send('updateFonts', Fonts.updateFonts());
         });
         isDev && tab.webContents.toggleDevTools();
 

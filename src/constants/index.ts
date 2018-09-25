@@ -7,7 +7,8 @@ export {
 	MAINTAB,
 	SETTITLE,
 	TOHOME,
-	UPDATEFILEKEY
+	UPDATEFILEKEY,
+	UPDATEFONTS
 } from './_ipcChannels';
 
 export {

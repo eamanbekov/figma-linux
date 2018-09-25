@@ -3,6 +3,7 @@ import { Component } from "react";
 import { h } from 'preact';
 const { observer, connect } = require('mobx-preact');
 
+import * as Const from "Const";
 import Panel from "./toppanel";
 import './style.scss'
 
@@ -25,12 +26,16 @@ class TopPanel extends Component<TopPanelProps, {}> {
         e.stopImmediatePropagation();
         e.stopPropagation();
 
-        E.ipcRenderer.send('maintab');
+        E.ipcRenderer.send(Const.MAINTAB);
         this.props.tabs!.setFocus(1);
     }
 
     private onHomeClick = (event: React.MouseEvent<HTMLDivElement> & Event) => {
-        E.ipcRenderer.send('toHome');
+        E.ipcRenderer.send(Const.TOHOME);
+    }
+    
+    private onUpdateFonts = (event: React.MouseEvent<HTMLDivElement> & Event) => {
+        E.ipcRenderer.send(Const.UPDATEFONTS);
     }
 
     render() {
@@ -38,6 +43,7 @@ class TopPanel extends Component<TopPanelProps, {}> {
             <Panel
                 current={this.props.tabs!.current}
                 onMainTab={this.onMainTab}
+                onUpdateFonts={this.onUpdateFonts}
                 onHomeClick={this.onHomeClick}
                 getTab={this.props.tabs!.getTab}
             />

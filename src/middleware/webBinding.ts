@@ -4,6 +4,7 @@ import * as E from "electron";
 import * as path from "path";
 import * as fs from "fs";
 
+import * as Const from "Const";
 import { sendMsgToMain } from "Utils";
 
 const API_VERSION = 9;
@@ -23,7 +24,7 @@ const onWebMessage = (event: MessageEvent) => {
     let resultPromise = undefined;
 
     try {
-        console.log('onWebMessage, msg: ', msg);
+        console.log('onWebMessage, msg: ', event, msg);
         resultPromise = msg.name && publicAPI && publicAPI[msg.name](msg.args);
     } finally {
         if (msg.promiseID != null) {
@@ -67,7 +68,7 @@ const initWebApi = (version: number, fileBrowser: boolean) => {
         postMessage: function (name, args, transferList) {
             console.log('postMessage, name, args, transferList: ', name, args, transferList);
             window.__figmaDesktop.fileBrowser = false;
-            
+
             channel.port1.postMessage({ name, args }, transferList);
         },
         promiseMessage: function (name, args, transferList) {
@@ -88,8 +89,8 @@ const initWebApi = (version: number, fileBrowser: boolean) => {
     channel.port1.onmessage = (event: MessageEvent) => {
         const msg = event.data;
 
-        if (!msg) return;
         console.log('channel.port1.onmessage, event: ', event);
+        if (!msg) return;
         if (msg.promiseID != null) {
             const pendingPromise = pendingPromises.get(msg.promiseID);
             if (pendingPromise) {
@@ -112,22 +113,44 @@ const initWebApi = (version: number, fileBrowser: boolean) => {
 }
 
 const initWebBindings = () => {
-    E.ipcRenderer.on('updateFonts', (event: Event, fonts: any) => {
+    E.ipcRenderer.on(Const.UPDATEFONTS, (event: Event, fonts: any) => {
         fontMap = fonts;
         if (resolveFontMapPromise) {
             resolveFontMapPromise();
             resolveFontMapPromise = null;
         }
+
+        function updateFonts() {
+            let promise: Promise<any> = window.__figmaDesktop.promiseMessage('getFonts');
+
+            promise.then(data => {
+                console.log('data: ', data);
+            }).catch(err => {
+                console.log('err: ', err);
+            });
+        }
+
+        let res = E.webFrame.executeJavaScript(`(${updateFonts.toString()})()`);
+
+        // res.then(data => console.log('data: ', data)).catch(err => console.log('err: ', err));
+        // onWebMessage(new MessageEvent('message', {
+        //     origin: location.origin,
+        //     data: {
+        //         name: 'getFonts',
+        //         args: undefined,
+        //         promiseID: 1
+        //     }
+        // }));
     })
 }
 
 const publicAPI: any = {
     setTitle(args: any) {
-        sendMsgToMain('setTitle', args.title);
+        sendMsgToMain(Const.SETTITLE, args.title);
     },
 
     getFonts() {
-        return new Promise(resolve => fontMapPromise.then(() => resolve({ data: fontMap })));
+        return new Promise(resolve => fontMapPromise.then(() => resolve({ data: fontMap })))
     },
     getFontFile(args: any) {
         return new Promise((resolve, reject) => {

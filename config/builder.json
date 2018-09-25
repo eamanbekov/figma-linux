@@ -38,9 +38,6 @@
         "description": "Unofficial desktop application for linux",
         "icon": "resources/icon",
         "category": "Graphic",
-        "depends": [
-            "libgconf2-4"
-        ],
         "target": [
             {
                 "target": "AppImage",
@@ -51,6 +48,9 @@
             },
             {
                 "target": "deb",
+                "depends": [
+                    "libgconf2-4"
+                ],
                 "arch": [
                     "x64",
                     "ia32"

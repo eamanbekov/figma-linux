@@ -27,6 +27,13 @@ class Fonts {
 
 		return fonts;
 	}
+
+	public static updateFonts = () => {
+		return Fonts.getFonts([
+			'/usr/share/fonts',
+			`${process.env.HOME}/.local/share/fonts`
+		]);
+	}
 }
 
 export default Fonts;

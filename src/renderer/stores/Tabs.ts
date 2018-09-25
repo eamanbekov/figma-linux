@@ -53,6 +53,10 @@ class Tabs implements ITabsStore {
 		E.ipcRenderer.on(Const.UPDATEFILEKEY, (sender: any, data: { id: number, fileKey: string }) => {
 			this.tabs = this.tabs.map(t => t.id === data.id ? { ...t, fileKey: data.fileKey } : t);
 		});
+
+		E.ipcRenderer.on(Const.UPDATEFONTS, (sender: any, data: any) => {
+			console.log('Const.UPDATEFONTS, data: ', data);
+		});
 	}
 }
 
